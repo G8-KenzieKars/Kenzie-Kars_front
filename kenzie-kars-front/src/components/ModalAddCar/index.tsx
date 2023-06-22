@@ -346,7 +346,11 @@ export const ModalAddCar = ({
               />
             )}
           />
-          <StyledButton buttonStyle="sm" buttonColor="brandOpacity">
+          <StyledButton
+            buttonStyle="sm"
+            buttonColor="brandOpacity"
+            style={{ maxWidth: "max-content" }}
+          >
             Adicionar campo para imagem da galeria
           </StyledButton>
           <FlexEnd>

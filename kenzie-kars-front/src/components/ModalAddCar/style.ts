@@ -28,7 +28,6 @@ export const StyledHeaderModal = styled.div`
 export const StyledBodyModal = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 24px;
 `;
 
