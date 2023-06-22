@@ -136,6 +136,7 @@ export const UserProvider = ({ children }: iChildren) => {
       setSpinner(false);
     }
   };
+
   const logoutUser = () => {
     window.localStorage.clear();
     setUser(defaultValues);

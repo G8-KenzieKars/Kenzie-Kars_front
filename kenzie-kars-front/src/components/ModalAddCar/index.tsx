@@ -1,52 +1,42 @@
-import { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { StyledText } from "../../styles/tipography";
-
-import { Modal } from "../Modal";
-import {
-  Flex,
-  FlexEnd,
-  StyledBodyModal,
-  StyledForm,
-  StyledHeaderModal,
-} from "./style";
-
-import { iModalAddCarProps, iVehicleFipeApi } from "./types";
+import { Modal } from "../modal";
 import { useForm, Controller } from "react-hook-form";
 import { StyledButton } from "../../styles/buttons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { vehicleSchema } from "./validators";
 import { fipeApi } from "../../services/fipeApi";
 import { AxiosResponse } from "axios";
 import { CssTextField } from "../forms/muiStyle";
 import { Autocomplete } from "@mui/material";
-import { api } from "../../services/api";
 import { AiOutlineClose } from "react-icons/ai";
+import {
+  StyledForm,
+  StyledHeaderModal,
+  StyledBodyModal,
+  Flex,
+  FlexEnd,
+} from "./style";
+import {
+  iModalAddCarProps,
+  iVehicleFipeApi,
+  iVehicleFormRequest,
+} from "./types";
+import { vehicleSchema } from "./validators";
 
 export const ModalAddCar = ({
+  brands,
   toggleModal,
   setVehicles,
 }: iModalAddCarProps) => {
   const [cars, setCars] = useState([] as Array<iVehicleFipeApi>);
-  const [brands, setBrands] = useState([] as Array<string>);
   const [models, setModels] = useState([] as Array<string>);
   const [year, setYear] = useState("");
   const [fuel, setFuel] = useState(0);
-  const [fipePrice, setFipePrice] = useState(0);
+  const [fipePrice, setFipePrice] = useState("");
 
   const fuelsOptions = ["flex", "híbrido", "elétrico"];
 
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const response = await fipeApi.get("/cars");
-        const brands = Object.keys(response.data);
-        setBrands(brands);
-      } catch (error) {
-        console.error("Error fetching car database", error);
-      }
-    };
-    fetchBrands();
-  }, []);
+  const [imagesNumber, setImagesNumber] = useState(2);
 
   const {
     control,
@@ -80,7 +70,7 @@ export const ModalAddCar = ({
     setModels([]);
     setYear("");
     setFuel(0);
-    setFipePrice(0);
+    setFipePrice("");
 
     if (value) {
       try {
@@ -104,17 +94,22 @@ export const ModalAddCar = ({
     let car;
     if (value) {
       car = cars.find((car) => car.name === value);
+    } else {
+      setYear("");
+      setFuel(0);
+      setFipePrice("");
     }
 
     if (car) {
       setYear(car.year);
       setFuel(car.fuel);
-      setFipePrice(car.value);
+      setFipePrice(String(car.value));
     }
   };
 
-  const onSubmit = async (data) => {
-    data = {
+  const onSubmit = async (data: iVehicleFormRequest) => {
+    console.log(data);
+    const newData = {
       ...data,
       fipe_price: fipePrice,
       year: year,
@@ -123,19 +118,21 @@ export const ModalAddCar = ({
       price: Number(data.price),
       images: [data.image1, data.image2],
     };
-    try {
-      const token = localStorage.getItem("@KenzieKars:token");
-      api.defaults.headers.common.authorization = `Bearer ${token}`;
 
-      const response = await api.post("vehicles", data);
-      setVehicles((previousVehicles) => [
-        ...(previousVehicles || []),
-        response.data,
-      ]);
-      toggleModal();
-    } catch (error) {
-      console.error(error);
-    }
+    console.log(data);
+    // try {
+    //   const token = localStorage.getItem("@KenzieKars:token");
+    //   api.defaults.headers.common.authorization = `Bearer ${token}`;
+
+    //   const response = await api.post("vehicles", data);
+    //   setVehicles((previousVehicles) => [
+    //     ...(previousVehicles || []),
+    //     response.data,
+    //   ]);
+    //   toggleModal();
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -172,7 +169,8 @@ export const ModalAddCar = ({
                   />
                 )}
                 onChange={(event, value) => {
-                  field.onChange(value);
+                  const selectedValue = typeof value === "string" ? value : "";
+                  field.onChange(selectedValue);
                   handleBrandChange(event, value);
                 }}
               />
@@ -197,7 +195,8 @@ export const ModalAddCar = ({
                   />
                 )}
                 onChange={(event, value) => {
-                  field.onChange(value);
+                  const selectedValue = typeof value === "string" ? value : "";
+                  field.onChange(selectedValue);
                   handleModelChange(event, value);
                 }}
                 disabled={!watch("brand")}
@@ -294,6 +293,8 @@ export const ModalAddCar = ({
                 label="Descrição"
                 error={!!errors.description}
                 helperText={errors.description?.message}
+                multiline
+                rows={3}
                 variant="outlined"
                 size="medium"
                 type="text"
@@ -321,7 +322,7 @@ export const ModalAddCar = ({
             render={({ field }) => (
               <CssTextField
                 {...field}
-                label="Primeira imagem da galeria"
+                label="1° Imagem da galeria"
                 error={!!errors.image1}
                 helperText={errors.image1?.message}
                 variant="outlined"
@@ -336,7 +337,7 @@ export const ModalAddCar = ({
             render={({ field }) => (
               <CssTextField
                 {...field}
-                label="Segunda imagem da galeria"
+                label="2° Imagem da galeria"
                 error={!!errors.image2}
                 helperText={errors.image2?.message}
                 variant="outlined"
@@ -345,17 +346,19 @@ export const ModalAddCar = ({
               />
             )}
           />
+          <StyledButton buttonStyle="sm" buttonColor="brandOpacity">
+            Adicionar campo para imagem da galeria
+          </StyledButton>
           <FlexEnd>
             <StyledButton
               onClick={toggleModal}
               type="button"
               buttonStyle="bg"
               buttonColor="negative"
-              width="126px"
             >
               Cancelar
             </StyledButton>
-            <StyledButton buttonStyle="bg" buttonColor="brand1" width="193px">
+            <StyledButton buttonStyle="bg" buttonColor="brand1">
               Criar anúncio
             </StyledButton>
           </FlexEnd>

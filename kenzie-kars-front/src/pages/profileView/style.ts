@@ -24,6 +24,7 @@ export const PerfilBox = styled.div`
     border-radius: var(--radius-2);
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 24px;
 
     @media (min-width: 700px) {

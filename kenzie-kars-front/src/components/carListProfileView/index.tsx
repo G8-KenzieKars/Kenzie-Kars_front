@@ -43,18 +43,10 @@ export const CarListProfileView = ({ vehicles }: iCarListProfileViewProps) => {
                 </StyledText>
               </Flex>
               <Flex2>
-                <StyledButton
-                  buttonStyle="sm"
-                  buttonColor="outline1"
-                  width="80px"
-                >
+                <StyledButton buttonStyle="sm" buttonColor="outline1">
                   Editar
                 </StyledButton>
-                <StyledButton
-                  buttonStyle="sm"
-                  buttonColor="outline1"
-                  width="126px"
-                >
+                <StyledButton buttonStyle="sm" buttonColor="outline1">
                   Ver detalhes
                 </StyledButton>
               </Flex2>

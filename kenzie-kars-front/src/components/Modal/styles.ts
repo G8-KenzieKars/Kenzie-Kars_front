@@ -30,9 +30,8 @@ export const Container = styled.div`
     border-radius: var(--radius-1);
     width: 520px;
     max-width: 90%;
-    padding: 0 0.6 2rem 0.6;
     overflow-y: auto;
-    max-height: calc(100vh - 156px);
+    max-height: calc(100vh - 25px);
     animation-name: ${animateModal};
     animation-iteration-count: 1;
     animation-duration: 1s;

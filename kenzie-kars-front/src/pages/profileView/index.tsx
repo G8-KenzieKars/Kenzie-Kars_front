@@ -10,37 +10,55 @@ import {
   PerfilBox,
   StyledDiv,
 } from "./style";
-import { ModalAddCar } from "../../components/ModalAddCar";
+import { ModalAddCar } from "../../components/modalAddCar";
 import { CarListProfileView } from "../../components/carListProfileView";
 import { useUser } from "../../hooks/useUser";
 import { api } from "../../services/api";
 import { iVehicle } from "./types";
+import { toast } from "react-toastify";
+import { fipeApi } from "../../services/fipeApi";
 
 export const ProfileView = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const toggleModal = () => setIsOpenModal(!isOpenModal);
 
   const [vehicles, setVehicles] = useState<Array<iVehicle> | null>(null);
+  const [brands, setBrands] = useState([] as Array<string>);
 
-  const { user } = useUser();
+  const { user, logoutUser } = useUser();
 
   const initials = user?.name?.substring(0, 2)?.toUpperCase();
 
   useEffect(() => {
-    const fetchUserCars = async () => {
-      const token = localStorage.getItem("@KenzieKars:token");
-      api.defaults.headers.common.authorization = `Bearer ${token}`;
+    (async () => {
+      try {
+        const token = localStorage.getItem("@KenzieKars:token");
+        if (!token) {
+          logoutUser();
+        }
+        api.defaults.headers.common.authorization = `Bearer ${token}`;
 
-      const response = await api.get("users/user_vehicles");
-      setVehicles(response.data.data);
-    };
-    fetchUserCars();
-  }, []);
+        const { data: userVehicles } = await api.get("users/user_vehicles");
+        setVehicles(userVehicles.data);
+
+        const { data: brandsApiFipe } = await fipeApi.get("/cars");
+        const brands = Object.keys(brandsApiFipe);
+        setBrands(brands);
+      } catch (error) {
+        console.error(error);
+        toast.error("Ops, algo deu errado");
+      }
+    })();
+  }, [logoutUser]);
 
   return (
     <>
       {isOpenModal && (
-        <ModalAddCar setVehicles={setVehicles} toggleModal={toggleModal} />
+        <ModalAddCar
+          brands={brands}
+          setVehicles={setVehicles}
+          toggleModal={toggleModal}
+        />
       )}
       <Container>
         <HeaderLoggedIn user={user} />
@@ -61,7 +79,6 @@ export const ProfileView = () => {
               onClick={toggleModal}
               buttonStyle="bg"
               buttonColor="outlineBrand1"
-              width="160px"
             >
               Criar anuncio
             </StyledButton>

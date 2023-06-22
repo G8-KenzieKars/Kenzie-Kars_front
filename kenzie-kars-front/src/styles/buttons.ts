@@ -17,7 +17,6 @@ interface iStyledButtonProps {
     | "success"
     | "brandDisable";
   buttonStyle: "sm" | "sm-modal" | "bg" | "round" | "bg-full" | "sm-modal-edit";
-  width?: string;
 }
 
 type iStyledLinkButtonProps = iStyledButtonProps & {
@@ -31,11 +30,8 @@ export const buttonCSS = css<iStyledButtonProps>`
 
   font-family: var(--font-family-inter);
   font-weight: 600;
-  white-space: nowrap;
 
   transition: 150ms ease-in-out;
-
-  width: ${({ width }) => width || "auto"};
 
   &:disabled {
     background-color: var(--color-grey5);

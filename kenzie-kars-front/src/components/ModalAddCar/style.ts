@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
+  padding: 1rem;
 `;
 
 export const StyledHeaderModal = styled.div`
@@ -27,6 +28,7 @@ export const StyledHeaderModal = styled.div`
 export const StyledBodyModal = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 24px;
 `;
 
@@ -41,6 +43,7 @@ export const Flex = styled.div`
 `;
 
 export const FlexEnd = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
